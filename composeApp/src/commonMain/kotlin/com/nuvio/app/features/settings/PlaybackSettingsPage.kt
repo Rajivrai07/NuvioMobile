@@ -24,6 +24,7 @@ import com.nuvio.app.core.ui.DialogButtons
 import com.nuvio.app.core.ui.DialogButtonStyle
 import com.nuvio.app.core.ui.DialogOption
 import com.nuvio.app.core.ui.DialogSurface
+import com.nuvio.app.core.ui.NuvioTokens
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
@@ -289,8 +290,9 @@ private fun SettingsSliderRow(
             valueRange = valueRange.first.toFloat()..valueRange.last.toFloat(),
             steps = calculateSteps(valueRange.first.toFloat(), valueRange.last.toFloat(), step.toFloat()),
             colors = SliderDefaults.colors(
-                thumbColor = MaterialTheme.colorScheme.primary,
-                activeTrackColor = MaterialTheme.colorScheme.primary,
+                thumbColor = NuvioTokens.Glass.content,
+                activeTrackColor = Color.White.copy(alpha = 0.85f),
+                inactiveTrackColor = NuvioTokens.Glass.fillStrong,
             ),
             modifier = Modifier.fillMaxWidth(),
         )

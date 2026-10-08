@@ -9,6 +9,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,6 +24,7 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.matchParentSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
@@ -51,6 +53,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -253,7 +256,12 @@ fun NuvioIconActionButton(
     IconButton(
         modifier = modifier
             .background(
-                color = tokens.colors.background.copy(alpha = 0.001f),
+                color = NuvioTokens.Glass.fill,
+                shape = tokens.shapes.avatar,
+            )
+            .border(
+                width = NuvioTokens.Glass.borderWidth,
+                color = NuvioTokens.Glass.border,
                 shape = tokens.shapes.avatar,
             ),
         onClick = onClick,
@@ -271,7 +279,7 @@ fun NuvioBackButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     shape: Shape = MaterialTheme.nuvio.shapes.avatar,
-    containerColor: Color = MaterialTheme.nuvio.colors.surface,
+    containerColor: Color = NuvioTokens.Glass.fill,
     contentColor: Color = MaterialTheme.nuvio.colors.textPrimary,
     buttonSize: Dp = NuvioTokens.Space.s40,
     iconSize: Dp = NuvioTokens.Icon.md,
@@ -284,6 +292,11 @@ fun NuvioBackButton(
             .size(buttonSize)
             .clip(shape)
             .background(containerColor)
+            .border(
+                width = NuvioTokens.Glass.borderWidth,
+                color = NuvioTokens.Glass.border,
+                shape = shape,
+            )
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
@@ -303,21 +316,36 @@ fun NuvioPrimaryButton(
     enabled: Boolean = true,
     onClick: () -> Unit = {},
 ) {
-    val tokens = MaterialTheme.nuvio
-    Button(
-        onClick = onClick,
+    // Liquid-glass style: frosted translucent fill + bright border + top highlight.
+    val glassShape = RoundedCornerShape(NuvioTokens.Glass.cornerRadius)
+    Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(NuvioTokens.Space.s48 + NuvioTokens.Space.s4),
-        enabled = enabled,
-        shape = tokens.shapes.button,
-        colors = ButtonDefaults.buttonColors(
-            containerColor = tokens.colors.accent,
-            contentColor = tokens.colors.onAccent,
-            disabledContainerColor = tokens.colors.accent.copy(alpha = tokens.opacity.disabled),
-            disabledContentColor = tokens.colors.onAccent.copy(alpha = tokens.opacity.disabled),
-        ),
+            .height(NuvioTokens.Space.s48 + NuvioTokens.Space.s4)
+            .clip(glassShape)
+            .background(if (enabled) NuvioTokens.Glass.fill else NuvioTokens.Glass.fillDisabled)
+            .border(
+                width = NuvioTokens.Glass.borderWidth,
+                color = NuvioTokens.Glass.border,
+                shape = glassShape,
+            )
+            .clickable(enabled = enabled, onClick = onClick),
+        contentAlignment = Alignment.Center,
     ) {
+        // Subtle top highlight for frosted-glass depth.
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            NuvioTokens.Glass.highlightTop,
+                            Color.Transparent,
+                        ),
+                    ),
+                    shape = glassShape,
+                ),
+        )
         AnimatedContent(
             targetState = text,
             transitionSpec = { fadeIn() togetherWith fadeOut() },
@@ -327,6 +355,8 @@ fun NuvioPrimaryButton(
                 text = animatedText,
                 style = MaterialTheme.typography.titleMedium,
                 textAlign = TextAlign.Center,
+                color = if (enabled) NuvioTokens.Glass.content else NuvioTokens.Glass.contentDisabled,
+                fontWeight = FontWeight.SemiBold,
             )
         }
     }

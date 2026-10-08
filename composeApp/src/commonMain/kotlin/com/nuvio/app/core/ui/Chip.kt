@@ -26,17 +26,17 @@ fun Chip(
         modifier = modifier,
         enabled = enabled,
         shape = RoundedCornerShape(NuvioTokens.Radius.md),
-        color = if (selected) tokens.colors.overlaySelected else Color.Transparent,
+        color = if (selected) tokens.colors.overlaySelected else NuvioTokens.Glass.fill,
         contentColor = when {
             !enabled -> tokens.colors.textDisabled
             selected -> tokens.colors.textPrimary
-            else -> tokens.colors.textMuted
+            else -> tokens.colors.textPrimary
         },
         border = BorderStroke(
             width = tokens.borders.thin,
             color = when {
                 selected -> tokens.colors.borderSelected
-                enabled -> tokens.colors.borderStrong
+                enabled -> NuvioTokens.Glass.border
                 else -> tokens.colors.borderDefault
             },
         ),

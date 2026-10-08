@@ -731,7 +731,9 @@ private fun PlayerProgressTrack(sliderState: SliderState) {
     val palette = MaterialTheme.themePalette
     val inactiveTrackColors = SliderDefaults.colors(
         activeTrackColor = Color.Transparent,
+        inactiveTrackColor = Color.White.copy(alpha = 0.20f),
         disabledActiveTrackColor = Color.Transparent,
+        disabledInactiveTrackColor = Color.White.copy(alpha = 0.20f),
     )
     val activeTrackColors = SliderDefaults.colors(
         activeTrackColor = Color.White,

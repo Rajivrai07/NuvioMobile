@@ -74,6 +74,20 @@ object NuvioTokens {
         val medium = Space.s2
     }
 
+    /** Liquid-glass (frosted) values shared by buttons, chips, sliders and icon buttons. */
+    object Glass {
+        val fill = Color.White.copy(alpha = 0.18f)
+        val fillDisabled = Color.White.copy(alpha = 0.08f)
+        val fillStrong = Color.White.copy(alpha = 0.26f)
+        val border = Color.White.copy(alpha = 0.35f)
+        val borderStrong = Color.White.copy(alpha = 0.55f)
+        val highlightTop = Color.White.copy(alpha = 0.22f)
+        val content = Color.White
+        val contentDisabled = Color.White.copy(alpha = 0.40f)
+        val cornerRadius = Space.s18
+        val borderWidth = Space.s1
+    }
+
     object Elevation {
         val none = Space.none
         val raised = Space.s2
