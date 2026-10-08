@@ -39,16 +39,16 @@
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>com.nuvio.app.auth</string>
+			<string>com.raitv.app.auth</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>nuvio</string>
+				<string>raitv</string>
 				<string>stremio</string>
 			</array>
 		</dict>
 	</array>
 	<key>NSLocalNetworkUsageDescription</key>
-	<string>Nuvio connects to media servers on your local network.</string>
+	<string>RAI TV connects to media servers on your local network.</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
