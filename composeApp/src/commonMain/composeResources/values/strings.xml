@@ -416,6 +416,7 @@
     <string name="compose_catalog_subtitle_simkl_library">Simkl Watchlist</string>
     <string name="compose_nav_home">Home</string>
     <string name="compose_nav_library">Library</string>
+    <string name="compose_nav_live">LIVE</string>
     <string name="compose_nav_profile">Profile</string>
     <string name="compose_nav_search">Search</string>
     <string name="compose_player_audio_tracks">Audio Tracks</string>
