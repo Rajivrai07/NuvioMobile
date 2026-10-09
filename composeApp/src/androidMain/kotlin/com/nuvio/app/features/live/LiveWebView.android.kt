@@ -45,7 +45,7 @@ internal actual fun LiveStreamWebView(
                         if (AdBlockLists.isAdUrl(reqUrl)) {
                             return WebResourceResponse(
                                 "text/plain", "utf-8", 200, "OK",
-                                emptyMap(), ByteArrayInputStream(ByteArray(0)),
+                                mutableMapOf(), ByteArrayInputStream(ByteArray(0)),
                             )
                         }
                         return super.shouldInterceptRequest(view, request)
