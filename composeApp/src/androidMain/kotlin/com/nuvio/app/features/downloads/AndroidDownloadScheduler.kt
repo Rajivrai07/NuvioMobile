@@ -3,11 +3,16 @@ package com.nuvio.app.features.downloads
 import android.app.job.JobInfo
 import android.app.job.JobScheduler
 import android.content.ComponentName
+import android.content.ContentValues
 import android.content.Context
+import android.media.MediaScannerConnection
 import android.net.Network
 import android.os.Build
+import android.os.Environment
 import android.os.PersistableBundle
 import android.os.SystemClock
+import android.provider.MediaStore
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.work.BackoffPolicy
@@ -187,6 +192,14 @@ internal class AndroidDownloadScheduler(val context: Context) {
                     errorMessage = null,
                 ))
             }
+            // RAI TV: also export a copy to the device's visible Downloads
+            // folder so the file shows up in the File Manager. A failure here
+            // must never fail the download itself — the internal copy above
+            // stays valid for in-app playback either way.
+            runCatching { exportToDeviceDownloads(destination) }
+                .onFailure { error ->
+                    Log.w(TAG, "Could not export download to device storage", error)
+                }
             false
         } catch (cancelled: CancellationException) {
             throw cancelled
@@ -201,6 +214,69 @@ internal class AndroidDownloadScheduler(val context: Context) {
             if (network != null) withContext(NonCancellable + Dispatchers.IO) { client.connectionPool.evictAll() }
         }
     }
+
+    private fun exportToDeviceDownloads(source: File) {
+        if (!source.isFile || source.length() == 0L) return
+        val fileName = source.name
+        val mimeType = mimeTypeForDownload(fileName)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val resolver = context.contentResolver
+            val values = ContentValues().apply {
+                put(MediaStore.Downloads.DISPLAY_NAME, fileName)
+                put(MediaStore.Downloads.MIME_TYPE, mimeType)
+                put(
+                    MediaStore.Downloads.RELATIVE_PATH,
+                    Environment.DIRECTORY_DOWNLOADS + "/RAI TV",
+                )
+                put(MediaStore.Downloads.IS_PENDING, 1)
+            }
+            val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values)
+                ?: throw IOException("MediaStore could not create the download entry")
+            try {
+                val output = resolver.openOutputStream(uri, "w")
+                    ?: throw IOException("MediaStore could not open the download entry")
+                output.use { out -> source.inputStream().use { input -> input.copyTo(out) } }
+                val publish = ContentValues().apply { put(MediaStore.Downloads.IS_PENDING, 0) }
+                resolver.update(uri, publish, null, null)
+            } catch (error: Exception) {
+                runCatching { resolver.delete(uri, null, null) }
+                throw error
+            }
+        } else {
+            @Suppress("DEPRECATION")
+            val publicDir = File(
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+                "RAI TV",
+            )
+            publicDir.mkdirs()
+            val target = File(publicDir, fileName)
+            if (!target.isFile || target.length() != source.length()) {
+                source.copyTo(target, overwrite = true)
+            }
+            MediaScannerConnection.scanFile(
+                context,
+                arrayOf(target.absolutePath),
+                arrayOf(mimeType),
+                null,
+            )
+        }
+    }
+
+    private fun mimeTypeForDownload(fileName: String): String =
+        when (fileName.substringAfterLast('.', "").lowercase()) {
+            "mp4", "m4v" -> "video/mp4"
+            "mkv" -> "video/x-matroska"
+            "webm" -> "video/webm"
+            "avi" -> "video/x-msvideo"
+            "mov" -> "video/quicktime"
+            "ts", "m2ts" -> "video/mp2t"
+            "mpg", "mpeg" -> "video/mpeg"
+            "mp3" -> "audio/mpeg"
+            "m4a" -> "audio/mp4"
+            "srt" -> "application/x-subrip"
+            "vtt" -> "text/vtt"
+            else -> "application/octet-stream"
+        }
 
     fun isActive(transfer: AndroidDownloadTransfer): Boolean = store.get(transfer.item.fileName)?.let {
         it.generation == transfer.generation && it.item.status == DownloadStatus.Downloading
@@ -232,6 +308,7 @@ internal class AndroidDownloadScheduler(val context: Context) {
         const val FILE_NAME = "download_file_name"
         const val GENERATION = "download_generation"
         const val JOB_NAMESPACE = "nuvio-downloads"
+        private const val TAG = "RaiTvDownloads"
     }
 }
 

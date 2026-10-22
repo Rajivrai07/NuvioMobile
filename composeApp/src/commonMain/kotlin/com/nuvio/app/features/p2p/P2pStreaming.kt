@@ -9,7 +9,7 @@ data class P2pSettingsUiState(
     val p2pEnabled: Boolean = false,
     val enableUpload: Boolean = true,
     val hideTorrentStats: Boolean = false,
-    val torrentProfile: P2pTorrentProfile = P2pTorrentProfile.BALANCED,
+    val torrentProfile: P2pTorrentProfile = P2pTorrentProfile.FAST,
     val cacheSize: P2pCacheSize = P2pCacheSize.GB_2,
 )
 
@@ -50,7 +50,7 @@ object P2pSettingsRepository {
     private var p2pEnabled = false
     private var enableUpload = true
     private var hideTorrentStats = false
-    private var torrentProfile = P2pTorrentProfile.BALANCED
+    private var torrentProfile = P2pTorrentProfile.FAST
     private var cacheSize = P2pCacheSize.GB_2
 
     fun ensureLoaded() {
@@ -67,7 +67,7 @@ object P2pSettingsRepository {
         p2pEnabled = false
         enableUpload = true
         hideTorrentStats = false
-        torrentProfile = P2pTorrentProfile.BALANCED
+        torrentProfile = P2pTorrentProfile.FAST
         cacheSize = P2pCacheSize.GB_2
         publish()
     }
@@ -119,7 +119,7 @@ object P2pSettingsRepository {
         hideTorrentStats = P2pSettingsStorage.loadHideTorrentStats() ?: false
         torrentProfile = P2pSettingsStorage.loadTorrentProfile()
             ?.let { stored -> P2pTorrentProfile.entries.firstOrNull { it.name == stored } }
-            ?: P2pTorrentProfile.BALANCED
+            ?: P2pTorrentProfile.FAST
         cacheSize = P2pSettingsStorage.loadCacheSize()
             ?.let { stored -> P2pCacheSize.entries.firstOrNull { it.name == stored } }
             ?: P2pCacheSize.GB_2
