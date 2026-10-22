@@ -111,7 +111,6 @@ internal fun LazyListScope.appearanceSettingsContent(
         var showLanguageRestartDialog by remember { mutableStateOf(false) }
         val layoutDirection = LocalLayoutDirection.current
         var showNavBarStyleSheet by remember { mutableStateOf(false) }
-        var showAppIconPicker by remember { mutableStateOf(false) }
         val navBarStyleAvailable = !isIos
         val glowEnabled by ThemeSettingsRepository.navBarGlowEnabled.collectAsStateWithLifecycle()
         val effectiveNavBarStyle = if (isTablet) NavBarStyle.COMPACT else selectedNavBarStyle
@@ -137,24 +136,6 @@ internal fun LazyListScope.appearanceSettingsContent(
                         onCheckedChange = onLiquidGlassNativeTabBarToggle,
                     )
                 }
-                SettingsGroupDivider(isTablet = isTablet)
-                SettingsNavigationRow(
-                    title = stringResource(Res.string.settings_appearance_app_icon),
-                    description = stringResource(appIconState.selected.labelResource),
-                    enabled = appIconState.pending == null,
-                    isTablet = isTablet,
-                    trailingContent = {
-                        AppIconThumbnail(
-                            icon = appIconState.selected,
-                            modifier = Modifier.size(if (isTablet) 44.dp else 40.dp),
-                            cornerRadius = if (isTablet) 11.dp else 10.dp,
-                        )
-                    },
-                    onClick = {
-                        onAppIconFailureDismissed()
-                        showAppIconPicker = true
-                    },
-                )
                 SettingsGroupDivider(isTablet = isTablet)
                 SettingsNavigationRow(
                     title = stringResource(Res.string.settings_appearance_app_language),
@@ -201,18 +182,6 @@ internal fun LazyListScope.appearanceSettingsContent(
             isVisible = showLanguageRestartDialog,
             onConfirm = { showLanguageRestartDialog = false },
         )
-
-        if (showAppIconPicker) {
-            AppIconPicker(
-                isTablet = isTablet,
-                state = appIconState,
-                onSelected = onAppIconSelected,
-                onDismiss = {
-                    onAppIconFailureDismissed()
-                    showAppIconPicker = false
-                },
-            )
-        }
 
         if (navBarStyleAvailable && showNavBarStyleSheet) {
             NavigationBarSettingsSheet(
